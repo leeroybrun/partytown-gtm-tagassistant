@@ -1,0 +1,104 @@
+<script type="text/javascript">
+    // Your Partytown config
+    window.partytown = {
+        proxyUrl: 'https://myproxy',
+        proxyUrlParam: 'url',
+        proxyDomains: [],
+        forward: ['datalayer.push'],
+        debug: true
+    }
+
+    // We check the URL for gtm_debug/gtm_preview and the presence of the __TAG_ASSISTANT_API object to detect if we're in a Tag Assistant session
+    // You can also simply enable/disable the Tag Assistant integration by setting the enabled property to true/false
+    var isTagAssistantSession = /[?&](gtm_debug|gtm_preview)=/.test(window.location.search) || window.__TAG_ASSISTANT_API !== undefined;
+    window.partytown.tagAssistant = {
+        enabled: isTagAssistantSession,
+        debug: true,
+        verbose: false,
+        scriptsToMonitor: [
+            window.partytown.proxyUrl,
+            'google-analytics.com',
+            'googletagmanager.com'
+        ]
+    };
+
+    if (window.partytown.tagAssistant.enabled) {
+        // We force Partytown to load scripts on the main thread if they contain /debug/ in the URL
+        // This is necessary because we want the /debug/bootstrap script to be loaded on the main thread
+        window.partytown.loadScriptsOnMainThread = window.partytown.loadScriptsOnMainThread || [];
+        window.partytown.loadScriptsOnMainThread.push(
+            /(\/|%2F)debug(\/|%2F)?/
+        );
+
+        // We add a custom accessor to Partytown, so we can communicate between the worker and the main thread
+        window.partytown.mainWindowAccessors = window.partytown.mainWindowAccessors || [];
+        window.partytown.mainWindowAccessors.push(
+            '__GTM_DEBUG_QUEUE_TUNNEL'
+        );
+
+        // We load our Tag Assistant helper scripts
+        // You could also load the main script & worker script directly here, if you don't want to use the loader script
+        // The scripts needs to be loaded BEFORE the GTM script
+        const loaderScript = document.createElement('script');
+        loaderScript.src = window.partytown.lib + '/partytown-tagassistant-loader.js';
+        document.head.insertBefore(loaderScript, document.head.firstChild);
+    }
+
+    window.partytown.resolveUrl = function resolveUrl(url, htmlElementLocation, type) {
+        // Try to find partytown config object
+        const workerConfig = globalThis.partytown || {};
+        const thisConfig = (this && typeof this.lib === 'string' ? this : null);
+        const config = thisConfig || workerConfig;
+
+        if (!config || !config.proxyUrl || !config.proxyDomains || !Array.isArray(config.proxyDomains)) {
+            return url;
+        }
+
+        if (config.debug) console.log('[PT resolveUrl]: url', ''+url, url, 'type', type);
+
+        let finalUrl = url; // Default to original URL
+        try {
+            if (config.proxyDomains.includes(url.hostname)) {
+                const proxifiedUrl = new URL(config.proxyUrl, location.origin);
+                proxifiedUrl.searchParams.append(config.proxyUrlParam, url.href);
+                finalUrl = proxifiedUrl;
+            }
+
+            // Hoist GTM iframe out of Partytown so that GTM can create its own worker normally.
+            // We still use the proxy to bypass the COEP issue (because of "credentialless" header for Atomics)
+            // but we don't want to load the iframe in Partytown.
+            if (url.hostname === 'www.googletagmanager.com' && type === 'iframe') {
+                if (config.debug) console.log('[PT resolveUrl]: Hoisting GTM iframe out of Partytown');
+
+                // Make sure your proxy returns the "Cross-Origin-Embedder-Policy: credentialless" header when type=iframe
+                // This is a custom parameter, could be anything
+                //finalUrl.searchParams.append('type', 'iframe');
+
+                // Send the proxified SW URL to be picked up by our custom listener
+                new BroadcastChannel('gtm-iframe').postMessage(finalUrl.href);
+                return new URL('data:'); // blank url to prevent iframe within Partytown
+            }
+        } catch (e) {
+            if (config.debug) console.error('[PT resolveUrl Error]', e, 'Original URL:', url.href, 'Config used:', config);
+
+            // Fallback to original URL in case of any error during processing
+            return url;
+        }
+
+        if (config.debug) console.log('[PT resolveUrl]: finalUrl', finalUrl);
+
+        return finalUrl;
+    };
+</script> 
+<script type="text/javascript" src="lib/partytown.js"></script>
+
+<!-- Google Tag Manager as documented here: https://partytown.qwik.dev/google-tag-manager/ -->
+<script type="text/partytown" src="https://www.googletagmanager.com/gtm.js?id=GTM-xxxxxxx"></script>
+<script type="text/partytown">
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+   
+    gtag('config', 'YOUR-ID-HERE');
+  </script>
+  
