@@ -42,7 +42,7 @@
     scriptsToMonitor: [
       'google-analytics.com',
       'googletagmanager.com',
-      'myproxy' // Add your proxy URL if using one
+      'myproxy' // Add your proxy domain/URL if you're using one
     ],
     decodeProxyUrl: 'https://myproxy?url='
   }
