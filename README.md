@@ -91,9 +91,13 @@ Output debug logs to the console for troubleshooting.
 Hook onto `window.__TAG_ASSISTANT_API` to output all messages between bootstrap & Tag Assistant to the console.
 
 ### tagAssistant.scriptsToMonitor
-An array of patterns checked whenever a `script` element is created. If a script's `src` contains any of these patterns, it's checked against Partytown's `loadScriptsOnMainThread` rules.
+An array of patterns checked whenever a `script` element is created on the page. 
+
+If a script's `src` contains any of these patterns, it's checked against Partytown's `loadScriptsOnMainThread` rules. If `src` matches `scriptsToMonitor` but doesn't match `loadScriptsOnMainThread`, the script's type will be forced to `text/partytown` to be loaded by Partytown.
 
 This is necessary because GTM debug bootstrap (running on the main thread) will append scripts that need to be intercepted and forced to run in Partytown. These patterns help identify those scripts.
+
+Please note that **ALL scripts created using `document.createElement` on the page** for which the `src` matches `scriptsToMonitor` and doesn't match `loadScriptsOnMainThread` will be forced into Partytown!
 
 ### tagAssistant.decodeProxyUrl
 Used when running with a proxy server. Set this to:
