@@ -56,8 +56,10 @@
 ```html
 <script type="text/javascript" src="lib/partytown-tagassistant-main.js"></script>
 <script type="text/partytown" src="lib/partytown-tagassistant-worker.js"></script>
+
 <!-- Load Partytown AFTER these scripts -->
 <script type="text/javascript" src="lib/partytown.js"></script>
+
 <!-- Your GTM script would follow, for example: -->
 <script type="text/partytown" src="https://www.googletagmanager.com/gtm.js?id=GTM-xxxxxxx"></script>
 <script type="text/javascript">
@@ -248,12 +250,12 @@ When GTM runs in debug mode:
 
 Our solution addresses several challenges:
 
-1. **Communication Bridge**: Establishing reliable communication between GTM in the worker and bootstrap on the main thread.
+1. **Communication Bridge**: Establishing reliable communication between GTM in the worker and bootstrap on the main thread. Allowing bootstrap to easily communicate with debug iframe.
 
 2. **Script Interception**: Detecting and intercepting scripts created by bootstrap to force them to run in Partytown.
 
-3. **URL Encoding**: Ensuring proper handling of URL parameters when using a proxy, especially the debug parameters added by Tag Assistant.
+3. **URL Encoding**: Ensuring proper handling of URL parameters when using a proxy, especially the debug parameters added by Tag Assistant/Bootstrap.
 
-4. **Timing**: Managing the execution sequence to ensure proper hooking into debug queues and message forwarding.
+4. **Timing**: Managing the execution sequence to ensure proper hooking into debug queues and message forwarding. As `gtm.js` expects the `window['google.tagmanager.debugui2.queue']` array NOT to exist on the first load to then load `/debug/bootstrap`, we have to wait for bootstrap to be created for us to hook into the queue created by `gtm.js`.
 
 By solving these challenges, this integration allows Tag Assistant to work seamlessly with GTM running inside Partytown, maintaining performance benefits while enabling debugging capabilities. 
