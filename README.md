@@ -137,7 +137,7 @@ The implementation follows these key steps:
 6. Worker registers a callback to be notified when `/debug/bootstrap` script is created by `gtm.js` via the tunnel object passed via `mainWindowAccessors`
 7. Partytown loads `gtm.js`
 8. GTM detects debug mode and loads `/debug/bootstrap` script
-9. Bootstrap loads on main thread (via `loadScriptsOnMainThread` pattern)
+9. Bootstrap <script> is created on main thread (by Partytown via `loadScriptsOnMainThread`)
 10. Main script detects bootstrap's creation and notifies the worker
 11. Worker hooks onto GTM's debug queue before bootstrap loads
 12. Worker flushes existing queue items to the main thread
