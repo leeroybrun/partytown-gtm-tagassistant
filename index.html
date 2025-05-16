@@ -1,0 +1,60 @@
+<script type="text/javascript">
+  // Your Partytown config
+  window.partytown = {
+    forward: ['datalayer.push'],
+    debug: true,
+  }
+
+  // We check the URL for gtm_debug/gtm_preview and the presence of the __TAG_ASSISTANT_API object to detect if we're in a Tag Assistant session
+  // You can also simply enable/disable the Tag Assistant integration by setting the enabled property to true/false
+  var isTagAssistantSession = /[?&](gtm_debug|gtm_preview)=/.test(window.location.search) || window.__TAG_ASSISTANT_API !== undefined;
+  window.partytown.tagAssistant = {
+    enabled: isTagAssistantSession,
+    debug: true,
+    verbose: false,
+    scriptsToMonitor: [
+      'google-analytics.com',
+      'googletagmanager.com',
+      'myproxy' // Add your proxy URL also if using one
+    ],
+    decodeProxyUrl: 'https://myproxy?url='
+  };
+
+  if (window.partytown.tagAssistant.enabled) {
+    // We force Partytown to load scripts on the main thread if they contain /debug/ in the URL
+    // This is necessary because we want the /debug/bootstrap script to be loaded on the main thread
+    window.partytown.loadScriptsOnMainThread = window.partytown.loadScriptsOnMainThread || [];
+    window.partytown.loadScriptsOnMainThread.push(
+      /(\/|%2F)debug(\/|%2F)?/
+    );
+
+    // We add a custom accessor to Partytown, so we can communicate between the worker and the main thread
+    window.partytown.mainWindowAccessors = window.partytown.mainWindowAccessors || [];
+    window.partytown.mainWindowAccessors.push(
+      '__GTM_DEBUG_QUEUE_TUNNEL'
+    );
+
+    // We load our Tag Assistant helper scripts
+    // You could also load the main script & worker script directly here, if you don't want to use the loader script
+    // The scripts needs to be loaded BEFORE the GTM script
+    const loaderScript = document.createElement('script');
+    loaderScript.src = window.partytown.lib + '/partytown-tagassistant-loader.js';
+    document.head.insertBefore(loaderScript, document.head.firstChild);
+  }
+</script> 
+<script type="text/javascript" src="lib/partytown.js"></script>
+
+<!-- Google Tag Manager  -->
+<script type="text/partytown" src="https://www.googletagmanager.com/gtm.js?id=GTM-xxxxxxx"></script>
+<script type="text/javascript">
+  // Initialize dataLayer to ensure it's available
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag(){dataLayer.push(arguments);}
+
+  // Push the standard GTM initialization event
+  window.dataLayer.push({
+    'gtm.start': new Date().getTime(), 
+    'event': 'gtm.js'
+  });
+</script>
+  
