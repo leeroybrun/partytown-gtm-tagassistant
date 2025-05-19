@@ -55,7 +55,7 @@
 
 3. Load the scripts by either:
    - Including `lib/partytown-tagassistant-loader.js` in your HTML
-   - OR adding manually BEFORE the GTM script:
+   - OR adding them manually BEFORE the GTM script:
        - `lib/partytown-tagassistant-main.js` using `type/javascript`
        - `lib/partytown-tagassistant-worker.js` using **`type/partytown`**
    
@@ -103,7 +103,7 @@ If a script's `src` contains any of these patterns, it's checked against Partyto
 
 This is necessary because GTM debug bootstrap (running on the main thread) will append scripts that need to be intercepted and forced to run in Partytown. These patterns help identify those scripts.
 
-Please note that **ALL scripts created using `document.createElement` on the page** for which the `src` matches `scriptsToMonitor` and doesn't match `loadScriptsOnMainThread` will be forced into Partytown!
+Please beware that **ALL scripts created using `document.createElement` on the page** for which the `src` matches `scriptsToMonitor` and doesn't match `loadScriptsOnMainThread` will be forced into Partytown! So make sure to keep `scriptsToMonitor` very specific.
 
 ### tagAssistant.decodeProxyUrl
 Used when running with a proxy server. Set this to:
