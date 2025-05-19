@@ -39,12 +39,14 @@
     enabled: true,
     debug: true,
     verbose: false,
+    decodeProxyUrl: 'https://myproxy?url='
+
+    // ALL scripts created on the page using document.createElement and matching these + NOT matching loadScriptsOnMainThread will be forced into Partytown
     scriptsToMonitor: [
       'google-analytics.com',
       'googletagmanager.com',
       'myproxy' // Add your proxy domain/URL if you're using one
-    ],
-    decodeProxyUrl: 'https://myproxy?url='
+    ]
   }
 }
 ```
