@@ -55,7 +55,9 @@
 
 3. Load the scripts by either:
    - Including `lib/partytown-tagassistant-loader.js` in your HTML
-   - Or adding them manually BEFORE the GTM script:
+   - OR adding manually BEFORE the GTM script:
+       - `lib/partytown-tagassistant-main.js` using `type/javascript`
+       - `lib/partytown-tagassistant-worker.js` using **`type/partytown`**
    
 ```html
 <script type="text/javascript" src="lib/partytown-tagassistant-main.js"></script>
