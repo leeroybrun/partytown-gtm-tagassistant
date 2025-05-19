@@ -39,19 +39,25 @@
     enabled: true,
     debug: true,
     verbose: false,
+    decodeProxyUrl: 'https://myproxy?url='
+
+    // Please beware: ALL scripts created on the page using document.createElement
+    // and matching scriptsToMonitor + NOT matching loadScriptsOnMainThread
+    // will be forced into Partytown. So make sure scriptsToMonitor is very specific.
     scriptsToMonitor: [
       'google-analytics.com',
       'googletagmanager.com',
       'myproxy' // Add your proxy domain/URL if you're using one
-    ],
-    decodeProxyUrl: 'https://myproxy?url='
+    ]
   }
 }
 ```
 
 3. Load the scripts by either:
    - Including `lib/partytown-tagassistant-loader.js` in your HTML
-   - Or adding them manually BEFORE the GTM script:
+   - OR adding them manually BEFORE the GTM script:
+       - `lib/partytown-tagassistant-main.js` using `type/javascript`
+       - `lib/partytown-tagassistant-worker.js` using **`type/partytown`**
    
 ```html
 <script type="text/javascript" src="lib/partytown-tagassistant-main.js"></script>
@@ -77,7 +83,7 @@
 
 4. Tag Assistant should now successfully connect to GTM running inside Partytown!
 
-You can check `index.html` for a full example.
+You can check `exemple.html` for a full example.
 
 ## Configuration Options
 
@@ -97,7 +103,7 @@ If a script's `src` contains any of these patterns, it's checked against Partyto
 
 This is necessary because GTM debug bootstrap (running on the main thread) will append scripts that need to be intercepted and forced to run in Partytown. These patterns help identify those scripts.
 
-Please note that **ALL scripts created using `document.createElement` on the page** for which the `src` matches `scriptsToMonitor` and doesn't match `loadScriptsOnMainThread` will be forced into Partytown!
+Please beware that **ALL scripts created using `document.createElement` on the page** for which the `src` matches `scriptsToMonitor` and doesn't match `loadScriptsOnMainThread` will be forced into Partytown! So make sure to keep `scriptsToMonitor` very specific.
 
 ### tagAssistant.decodeProxyUrl
 Used when running with a proxy server. Set this to:
