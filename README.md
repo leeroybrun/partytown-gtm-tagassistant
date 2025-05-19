@@ -83,7 +83,7 @@
 
 4. Tag Assistant should now successfully connect to GTM running inside Partytown!
 
-You can check `index.html` for a full example.
+You can check `exemple.html` for a full example.
 
 ## Configuration Options
 
