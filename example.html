@@ -14,8 +14,9 @@
     verbose: false,
     decodeProxyUrl: 'https://myproxy?url=',
 
-    // ALL scripts created on the page using document.createElement and
-    // matching scriptsToMonitor + NOT matching loadScriptsOnMainThread will be forced into Partytown
+    // Please beware: ALL scripts created on the page using document.createElement
+    // and matching scriptsToMonitor + NOT matching loadScriptsOnMainThread
+    // will be forced into Partytown. So make sure scriptsToMonitor is very specific.
     scriptsToMonitor: [
       'google-analytics.com',
       'googletagmanager.com',
