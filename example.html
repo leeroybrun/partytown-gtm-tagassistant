@@ -12,12 +12,14 @@
     enabled: isTagAssistantSession,
     debug: true,
     verbose: false,
+    decodeProxyUrl: 'https://myproxy?url=',
+
+    // ALL scripts created on the page using document.createElement and matching these + NOT matching loadScriptsOnMainThread will be forced into Partytown
     scriptsToMonitor: [
       'google-analytics.com',
       'googletagmanager.com',
       'myproxy' // Add your proxy URL also if using one
-    ],
-    decodeProxyUrl: 'https://myproxy?url='
+    ]
   };
 
   if (window.partytown.tagAssistant.enabled) {
